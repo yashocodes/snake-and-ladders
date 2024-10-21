@@ -1,0 +1,137 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define BOARD_SIZE 100
+
+// Function to simulate dice roll
+int rollDice() {
+    return (rand() % 6) + 1;
+}
+
+// Function to move player based on current position, snakes, and ladders
+int movePlayer(int position) {
+    // Snakes
+    if (position == 99) return 78;
+    if (position == 93) return 73;
+    if (position == 87) return 24;
+    if (position == 62) return 18;
+    if (position == 54) return 34;
+
+    // Ladders
+    if (position == 2) return 38;
+    if (position == 7) return 14;
+    if (position == 8) return 31;
+    if (position == 15) return 26;
+    if (position == 28) return 84;
+    if (position == 21) return 42;
+    if (position == 51) return 67;
+    if (position == 72) return 91;
+    if (position == 78) return 98;
+
+    // Return position if no snake or ladder
+    return position;
+}
+
+// Function to print the game board
+void printBoard(int player1, int player2) {
+    int board[101];
+    for (int i = 1; i <= 100; i++) {
+        board[i] = i;
+    }
+
+    int alt = 0; // Alternates between printing left to right and right to left
+    int iterLR = 101; // Iterator for left to right
+    int iterRL = 80; // Iterator for right to left
+    int val = 100;
+
+    while (val--) {
+        if (alt == 0) {
+            iterLR--;
+            if (iterLR == player1) {
+                printf("#P1 ");
+            } else if (iterLR == player2) {
+                printf("#P2 ");
+            } else {
+                printf("%d ", board[iterLR]);
+            }
+
+            if (iterLR % 10 == 1) {
+                printf("\n");
+                alt = 1;
+                iterLR -= 10;
+            }
+        } else {
+            iterRL++;
+            if (iterRL == player1) {
+                printf("#P1 ");
+            } else if (iterRL == player2) {
+                printf("#P2 ");
+            } else {
+                printf("%d ", board[iterRL]);
+            }
+
+            if (iterRL % 10 == 0) {
+                printf("\n");
+                alt = 0;
+                iterRL -= 30;
+            }
+        }
+        if (iterRL == 10) break;
+    }
+    printf("\n");
+}
+
+int main() {
+    srand(time(0));  // Seed for random number generation
+
+    int player1 = 0, player2 = 0;  // Starting positions for players
+    int turn = 1;  // Player turn tracker
+
+    printf("Welcome to Snake and Ladders game!\n");
+    printf("First player to reach 100 wins the game!\n");
+
+    while (player1 < BOARD_SIZE && player2 < BOARD_SIZE) {
+        int diceRoll;
+
+        if (turn == 1) {
+            printf("\nPlayer 1's turn! Press Enter to roll the dice...\n");
+            getchar();
+            diceRoll = rollDice();
+            printf("Player 1 rolled: %d\n", diceRoll);
+
+            player1 += diceRoll;
+            if (player1 > BOARD_SIZE) player1 -= diceRoll;  // Stay within board limits
+            player1 = movePlayer(player1);
+            printf("Player 1 moved to position: %d\n", player1);
+            printBoard(player1, player2);  // Print the board after Player 1's move
+
+            if (player1 == BOARD_SIZE) {
+                printf("Player 1 wins the game!\n");
+                break;
+            }
+
+            turn = 2;  // Switch to player 2
+        } else {
+            printf("\nPlayer 2's turn! Press Enter to roll the dice...\n");
+            getchar();
+            diceRoll = rollDice();
+            printf("Player 2 rolled: %d\n", diceRoll);
+
+            player2 += diceRoll;
+            if (player2 > BOARD_SIZE) player2 -= diceRoll;  // Stay within board limits
+            player2 = movePlayer(player2);
+            printf("Player 2 moved to position: %d\n", player2);
+            printBoard(player1, player2);  // Print the board after Player 2's move
+
+            if (player2 == BOARD_SIZE) {
+                printf("Player 2 wins the game!\n");
+                break;
+            }
+
+            turn = 1;  // Switch to player 1
+        }
+    }
+
+    return 0;
+}
